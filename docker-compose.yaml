@@ -1,0 +1,51 @@
+networks:
+  craft:
+    driver: bridge
+
+services:
+  fronted:
+    image: craft-frontend:dev 
+    build: 
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - craft
+
+  catalogue:
+    image: craft-catalogue:dev 
+    build: 
+      context: ./catalogue
+    ports:
+      - "50:5000"
+    networks:
+      - craft
+
+  catalogue-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=devops
+      - POSTGRES_PASSWORD=devops
+      - POSTGRES_DB=catalogue
+    networks:
+      - craft
+
+  recco:
+    image: craft-recco:dev 
+    build: 
+      context: ./recommendation
+    ports:
+      - "8080:8080"
+    networks:
+      - craft
+
+  voting:
+    image: craft-voting:dev
+    build: 
+      context: ./voting
+    ports:
+      - "8081:8080"
+    depends_on:
+      - catalogue
+    networks:
+      - craft
